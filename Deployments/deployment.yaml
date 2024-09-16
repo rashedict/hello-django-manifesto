@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: hello-django
-          image: rashed271202/hello-django:v1.0
+          image: rashed271202/hello-django:v1.1
           ports:
             - containerPort: 8000
           volumeMounts:
