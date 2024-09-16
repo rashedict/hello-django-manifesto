@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-django
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-django
+  template:
+    metadata:
+      labels:
+        app: hello-django
+    spec:
+      containers:
+        - name: hello-django
+          image: rashed271202/hello-django:v1
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: django-storage
+              mountPath: /app/data
+      volumes:
+        - name: django-storage
+          persistentVolumeClaim:
+            claimName: django-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-django-service
+spec:
+  selector:
+    app: hello-django
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: django-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"  # Local path for development
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: django-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
